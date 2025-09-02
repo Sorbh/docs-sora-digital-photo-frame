@@ -1,0 +1,211 @@
+---
+title: "Create Folder"
+description: "Create new folders in the photo collection"
+---
+
+## POST /api/folders
+
+Creates a new folder in the photo frame collection. Requires admin authentication.
+
+<Warning>
+This is a protected endpoint. You must be logged in as admin to create folders.
+</Warning>
+
+### Request
+
+<ParamField body="path" type="string" required>
+  Full path for the new folder (relative to uploads directory)
+</ParamField>
+
+<ParamField body="name" type="string" required>
+  Folder name (used for the final directory in the path)
+</ParamField>
+
+### Request Examples
+
+```bash Root Level Folder
+curl -X POST http://localhost:3000/api/folders \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session-cookie" \
+  -d '{"path": "new-album", "name": "new-album"}'
+```
+
+```bash Nested Folder
+curl -X POST http://localhost:3000/api/folders \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session-cookie" \
+  -d '{"path": "vacation/2024/spring", "name": "spring"}'
+```
+
+### Response
+
+<ResponseExample>
+```json Success Response
+{
+  "success": true,
+  "message": "Folder created successfully",
+  "data": {
+    "folderPath": "vacation/2024/spring",
+    "folderName": "spring",
+    "parentPath": "vacation/2024",
+    "created": "2023-08-15T10:30:00Z",
+    "exists": false
+  }
+}
+```
+</ResponseExample>
+
+<ResponseExample>
+```json Folder Exists Response  
+{
+  "success": true,
+  "message": "Folder already exists",
+  "data": {
+    "folderPath": "vacation/2023",
+    "folderName": "2023", 
+    "parentPath": "vacation",
+    "created": "2023-01-15T08:20:00Z",
+    "exists": true
+  }
+}
+```
+</ResponseExample>
+
+<ResponseExample>
+```json Error Response
+{
+  "success": false,
+  "error": "Invalid folder name contains prohibited characters",
+  "code": "INVALID_FOLDER_NAME",
+  "details": {
+    "prohibitedChars": ["<", ">", ":", "\"", "|", "?", "*", "\\"]
+  }
+}
+```
+</ResponseExample>
+
+### Response Fields
+
+<ResponseField name="folderPath" type="string">
+  Full path to the created/existing folder
+</ResponseField>
+
+<ResponseField name="folderName" type="string">
+  Name of the folder
+</ResponseField>
+
+<ResponseField name="parentPath" type="string">
+  Path to the parent directory
+</ResponseField>
+
+<ResponseField name="created" type="string">
+  ISO timestamp when folder was created
+</ResponseField>
+
+<ResponseField name="exists" type="boolean">
+  Whether the folder already existed before this request
+</ResponseField>
+
+### Status Codes
+
+<ResponseField name="200" type="Success">
+  Folder created successfully or already exists
+</ResponseField>
+
+<ResponseField name="400" type="Bad Request">
+  Invalid folder name or path format
+</ResponseField>
+
+<ResponseField name="401" type="Unauthorized">
+  Admin authentication required
+</ResponseField>
+
+<ResponseField name="500" type="Server Error">
+  File system error during folder creation
+</ResponseField>
+
+### Folder Name Rules
+
+<Warning>
+Folder names cannot contain these characters: `< > : " | ? * \`
+</Warning>
+
+**Valid Characters:**
+- Letters (a-z, A-Z)
+- Numbers (0-9)
+- Spaces
+- Hyphens (-)
+- Underscores (_)
+- Periods (.)
+
+**Naming Guidelines:**
+- Use descriptive names
+- Avoid very long names (keep under 100 characters)
+- Consider sorting (use dates, numbers for chronological order)
+
+### JavaScript Example
+
+```javascript
+async function createFolder(folderPath, folderName) {
+  try {
+    const response = await fetch('/api/folders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include', // Include session cookie
+      body: JSON.stringify({
+        path: folderPath,
+        name: folderName
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      if (result.data.exists) {
+        console.log('Folder already exists:', result.data.folderPath);
+      } else {
+        console.log('Folder created:', result.data.folderPath);
+      }
+      return result.data;
+    } else {
+      throw new Error(result.error);
+    }
+  } catch (error) {
+    console.error('Folder creation failed:', error);
+    throw error;
+  }
+}
+
+// Usage examples
+createFolder('events/2024', '2024')
+  .then(folder => {
+    console.log('Ready to upload to:', folder.folderPath);
+  });
+
+createFolder('backup/old-photos', 'old-photos')
+  .then(folder => {
+    console.log('Backup folder ready:', folder.folderPath);
+  });
+```
+
+### Nested Folder Creation
+
+The API automatically creates parent directories if they don't exist:
+
+```javascript
+// This will create all necessary parent folders:
+// - events/
+// - events/2024/
+// - events/2024/wedding/
+// - events/2024/wedding/ceremony/
+createFolder('events/2024/wedding/ceremony', 'ceremony');
+```
+
+### Best Practices
+
+- **Organization**: Use consistent naming schemes (dates, categories)
+- **Hierarchy**: Create logical folder structures (year/month, event/location)
+- **Planning**: Create folders before uploading related images
+- **Validation**: Check folder names before creation to avoid errors

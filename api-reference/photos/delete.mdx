@@ -1,0 +1,196 @@
+---
+title: "Delete Images"
+description: "Delete images from the photo frame collection"
+---
+
+## DELETE /api/images
+
+Deletes one or more images from the photo frame collection. Requires admin authentication.
+
+<Warning>
+This is a protected endpoint. You must be logged in as admin to delete images.
+</Warning>
+
+### Request
+
+<ParamField body="images" type="string[]" required>
+  Array of image paths to delete (relative to uploads directory)
+</ParamField>
+
+### Request Example
+
+```bash Single Image
+curl -X DELETE http://localhost:3000/api/images \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session-cookie" \
+  -d '{"images": ["vacation/2023/photo1.jpg"]}'
+```
+
+```bash Multiple Images
+curl -X DELETE http://localhost:3000/api/images \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session-cookie" \
+  -d '{"images": ["vacation/2023/photo1.jpg", "vacation/2023/photo2.png", "old-photos/sunset.jpg"]}'
+```
+
+### Response
+
+<ResponseExample>
+```json Success Response
+{
+  "success": true,
+  "message": "3 images deleted successfully",
+  "data": {
+    "deletedImages": [
+      {
+        "path": "vacation/2023/photo1.jpg",
+        "status": "deleted",
+        "size": 2048576
+      },
+      {
+        "path": "vacation/2023/photo2.png",
+        "status": "deleted", 
+        "size": 1536000
+      },
+      {
+        "path": "old-photos/sunset.jpg",
+        "status": "deleted",
+        "size": 3072000
+      }
+    ],
+    "totalDeleted": 3,
+    "totalSize": 6656576
+  }
+}
+```
+</ResponseExample>
+
+<ResponseExample>
+```json Partial Success Response
+{
+  "success": true,
+  "message": "2 of 3 images deleted successfully",
+  "data": {
+    "deletedImages": [
+      {
+        "path": "vacation/2023/photo1.jpg",
+        "status": "deleted",
+        "size": 2048576
+      },
+      {
+        "path": "vacation/2023/photo2.png",
+        "status": "deleted",
+        "size": 1536000
+      },
+      {
+        "path": "missing/photo.jpg",
+        "status": "not_found",
+        "error": "File does not exist"
+      }
+    ],
+    "totalDeleted": 2,
+    "totalSize": 3584576
+  }
+}
+```
+</ResponseExample>
+
+<ResponseExample>
+```json Error Response
+{
+  "success": false,
+  "error": "No images specified for deletion",
+  "code": "MISSING_IMAGES_PARAMETER"
+}
+```
+</ResponseExample>
+
+### Status Codes
+
+<ResponseField name="200" type="Success">
+  Images deleted successfully (may include partial failures)
+</ResponseField>
+
+<ResponseField name="400" type="Bad Request">
+  Missing or invalid images parameter
+</ResponseField>
+
+<ResponseField name="401" type="Unauthorized">
+  Admin authentication required
+</ResponseField>
+
+<ResponseField name="500" type="Server Error">
+  File system error during deletion
+</ResponseField>
+
+### JavaScript Example
+
+```javascript
+async function deleteImages(imagePaths) {
+  try {
+    const response = await fetch('/api/images', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include', // Include session cookie
+      body: JSON.stringify({
+        images: imagePaths
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      console.log(`Deleted ${result.data.totalDeleted} images`);
+      
+      // Check for any failures
+      const failed = result.data.deletedImages.filter(img => img.status !== 'deleted');
+      if (failed.length > 0) {
+        console.warn('Some images could not be deleted:', failed);
+      }
+      
+      return result.data.deletedImages;
+    } else {
+      throw new Error(result.error);
+    }
+  } catch (error) {
+    console.error('Delete failed:', error);
+    throw error;
+  }
+}
+
+// Usage example
+const imagesToDelete = [
+  'vacation/2023/blurry-photo.jpg',
+  'old-photos/duplicate.png'
+];
+
+deleteImages(imagesToDelete)
+  .then(results => {
+    console.log('Deletion complete:', results);
+  })
+  .catch(error => {
+    console.error('Deletion failed:', error);
+  });
+```
+
+### Important Notes
+
+<Warning>
+**Permanent Deletion**: Deleted images cannot be recovered. Make sure you have backups if needed.
+</Warning>
+
+- Image paths should be relative to the uploads directory
+- Use forward slashes for path separators
+- Non-existent files are reported but don't cause the entire operation to fail
+- Empty folders are not automatically removed after deleting all contents
+- Deletion is permanent - there is no trash/recycle bin functionality
+
+### Bulk Operations
+
+For deleting many images:
+- Consider breaking large batches into smaller chunks
+- Monitor server response times for large operations
+- Check the response for any partial failures
+- Failed deletions don't stop the processing of remaining images

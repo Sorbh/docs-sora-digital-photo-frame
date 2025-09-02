@@ -1,0 +1,173 @@
+---
+title: "Upload Images"
+description: "Upload new images to the photo frame collection"
+---
+
+## POST /api/upload
+
+Uploads one or more images to the photo frame collection. Requires admin authentication.
+
+<Warning>
+This is a protected endpoint. You must be logged in as admin to upload images.
+</Warning>
+
+### Request
+
+<ParamField body="files" type="file[]" required>
+  One or more image files to upload
+</ParamField>
+
+<ParamField body="folder" type="string" optional>
+  Target folder path. If not specified, uploads to root directory.
+</ParamField>
+
+### Request Example
+
+```bash Single File
+curl -X POST http://localhost:3000/api/upload \
+  -H "Cookie: session-cookie" \
+  -F "files=@photo1.jpg"
+```
+
+```bash Multiple Files with Folder
+curl -X POST http://localhost:3000/api/upload \
+  -H "Cookie: session-cookie" \
+  -F "files=@photo1.jpg" \
+  -F "files=@photo2.png" \
+  -F "folder=vacation/2023"
+```
+
+### Response
+
+<ResponseExample>
+```json Success Response
+{
+  "success": true,
+  "message": "3 files uploaded successfully",
+  "data": {
+    "uploadedFiles": [
+      {
+        "originalName": "photo1.jpg",
+        "fileName": "photo1.jpg",
+        "path": "vacation/2023/photo1.jpg",
+        "size": 2048576,
+        "mimeType": "image/jpeg"
+      },
+      {
+        "originalName": "photo2.png", 
+        "fileName": "photo2.png",
+        "path": "vacation/2023/photo2.png",
+        "size": 1536000,
+        "mimeType": "image/png"
+      }
+    ],
+    "folder": "vacation/2023",
+    "totalFiles": 2,
+    "totalSize": 3584576
+  }
+}
+```
+</ResponseExample>
+
+<ResponseExample>
+```json Error Response
+{
+  "success": false,
+  "error": "File too large",
+  "code": "FILE_SIZE_EXCEEDED",
+  "details": {
+    "maxSize": "10MB",
+    "fileSize": "15MB",
+    "fileName": "large-photo.jpg"
+  }
+}
+```
+</ResponseExample>
+
+### File Restrictions
+
+<ResponseField name="File Size" type="Limit">
+  Maximum 10MB per file (configurable via MAX_FILE_SIZE env var)
+</ResponseField>
+
+<ResponseField name="File Types" type="Allowed">
+  JPEG, PNG, GIF, WebP images only
+</ResponseField>
+
+<ResponseField name="File Count" type="Limit">
+  No hard limit, but large batches may timeout
+</ResponseField>
+
+### Status Codes
+
+<ResponseField name="200" type="Success">
+  Files uploaded successfully
+</ResponseField>
+
+<ResponseField name="400" type="Bad Request">
+  Invalid file format or missing files
+</ResponseField>
+
+<ResponseField name="401" type="Unauthorized">
+  Admin authentication required
+</ResponseField>
+
+<ResponseField name="413" type="Payload Too Large">
+  File size exceeds maximum limit
+</ResponseField>
+
+<ResponseField name="500" type="Server Error">
+  Upload processing or file system error
+</ResponseField>
+
+### JavaScript Example
+
+```javascript
+async function uploadImages(files, folder = '') {
+  const formData = new FormData();
+  
+  // Add files to form data
+  files.forEach(file => {
+    formData.append('files', file);
+  });
+  
+  // Add folder if specified
+  if (folder) {
+    formData.append('folder', folder);
+  }
+  
+  try {
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+      credentials: 'include' // Include session cookie
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      console.log(`Uploaded ${result.data.totalFiles} files`);
+      return result.data.uploadedFiles;
+    } else {
+      throw new Error(result.error);
+    }
+  } catch (error) {
+    console.error('Upload failed:', error);
+    throw error;
+  }
+}
+
+// Usage with file input
+const fileInput = document.getElementById('file-input');
+fileInput.addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files);
+  await uploadImages(files, 'new-photos');
+});
+```
+
+### Folder Creation
+
+- Target folders are created automatically if they don't exist
+- Nested folder paths are supported (e.g., `vacation/2023/summer`)
+- Use forward slashes for folder separators
+- Folder names cannot contain special characters: `< > : " | ? * \`

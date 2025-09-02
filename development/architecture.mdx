@@ -1,0 +1,94 @@
+---
+title: "Architecture"
+description: "Understanding the structure and design of Sora Digital Photo Frame"
+---
+
+## Project Structure
+
+Understanding the codebase structure:
+
+```
+sora-digital-photo-frame/
+├── documentation/           # Technical specifications
+├── server/                  # Node.js backend
+│   ├── controllers/         # Business logic
+│   ├── middleware/          # Express middleware
+│   ├── routes/             # API endpoints
+│   ├── public/             # Frontend files
+│   ├── uploads/            # Image storage
+│   └── server.js           # Main entry point
+└── README.md
+```
+
+## Data Flow
+
+<Steps>
+  <Step title="Client Request">
+    Browser sends request to Express server
+  </Step>
+  
+  <Step title="Middleware Processing">
+    Authentication, validation, and logging middleware process request
+  </Step>
+  
+  <Step title="Route Handler">
+    Specific route handler processes business logic
+  </Step>
+  
+  <Step title="File Operations">
+    File system operations or image processing as needed
+  </Step>
+  
+  <Step title="Response">
+    JSON response sent back to client
+  </Step>
+</Steps>
+
+## Security Architecture
+
+<AccordionGroup>
+  <Accordion icon="shield" title="Authentication & Authorization">
+    **Admin Access Control**
+    - Password-based admin authentication
+    - Session-based authorization
+    - Protected admin endpoints
+    - Secure file upload validation
+    
+    **File Security**
+    - File type validation
+    - Size limits enforcement
+    - Path traversal protection
+    - Malicious file detection
+  </Accordion>
+  
+  <Accordion icon="lock" title="Data Protection">
+    **Input Validation**
+    - Request parameter sanitization
+    - File upload validation
+    - SQL injection prevention (though no SQL used)
+    - XSS protection in admin panel
+    
+    **Environment Security**
+    - Environment variable configuration
+    - Secure defaults
+    - Error information hiding in production
+  </Accordion>
+</AccordionGroup>
+
+## Technology Stack
+
+<CardGroup cols={2}>
+  <Card title="Backend Technologies" icon="server">
+    - **Runtime**: Node.js 18+
+    - **Framework**: Express.js
+    - **Image Processing**: Sharp
+    - **File Handling**: Native Node.js fs
+  </Card>
+  
+  <Card title="Frontend Technologies" icon="code">
+    - **JavaScript**: Vanilla ES6+
+    - **CSS**: CSS3 with Custom Properties
+    - **Design**: Material Design
+    - **Build**: No build system (vanilla approach)
+  </Card>
+</CardGroup>

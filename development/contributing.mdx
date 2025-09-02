@@ -1,0 +1,139 @@
+---
+title: "Contributing"
+description: "How to contribute to Sora Digital Photo Frame project"
+---
+
+## Welcome Contributors! 🎉
+
+We're thrilled that you're interested in contributing to Sora Digital Photo Frame!
+
+## Quick Start
+
+<Steps>
+  <Step title="Fork and clone">
+    ```bash
+    git clone https://github.com/YOUR_USERNAME/sora-digital-photo-frame.git
+    cd sora-digital-photo-frame
+    git remote add upstream https://github.com/Sorbh/sora-digital-photo-frame.git
+    ```
+  </Step>
+  
+  <Step title="Install and run">
+    ```bash
+    npm install
+    cp .env.example .env
+    npm run dev
+    ```
+  </Step>
+  
+  <Step title="Make changes">
+    ```bash
+    git checkout -b feature/your-feature-name
+    # Make your changes
+    git commit -m "feat: your feature description"
+    git push origin feature/your-feature-name
+    ```
+  </Step>
+</Steps>
+
+## Ways to Contribute
+
+<CardGroup cols={2}>
+  <Card title="Code" icon="code">
+    Submit bug fixes, new features, or improvements
+  </Card>
+  
+  <Card title="Documentation" icon="book">
+    Improve docs, add examples, or create tutorials
+  </Card>
+  
+  <Card title="Issues" icon="bug">
+    Report bugs or suggest new features
+  </Card>
+  
+  <Card title="Reviews" icon="eye">
+    Help review pull requests from other contributors
+  </Card>
+</CardGroup>
+
+## Development Guidelines
+
+### Prerequisites
+
+- **Node.js 18.0+** - Required for running the application
+- **Git** - For version control
+- **GitHub account** - For submitting contributions
+
+### Coding Standards
+
+<AccordionGroup>
+  <Accordion icon="code" title="JavaScript">
+    - Use ES6+ features and async/await
+    - Follow existing code style
+    - Add JSDoc comments for functions
+    - Handle errors properly
+  </Accordion>
+  
+  <Accordion icon="palette" title="CSS">
+    - Follow Material Design principles
+    - Use mobile-first responsive design
+    - Prefer CSS custom properties
+    - Use BEM naming convention
+  </Accordion>
+</AccordionGroup>
+
+### Commit Messages
+
+Use [Conventional Commits](https://conventionalcommits.org/) format:
+
+```bash
+feat: add new slideshow transition
+fix: resolve image upload issue
+docs: update installation guide
+```
+
+## Pull Request Process
+
+<Steps>
+  <Step title="Before submitting">
+    - [ ] Code follows project style
+    - [ ] Tests pass (`npm test`)
+    - [ ] No console errors
+    - [ ] Documentation updated if needed
+  </Step>
+  
+  <Step title="Create PR">
+    - Link to related issue
+    - Describe what changed and why
+    - Include screenshots for UI changes
+  </Step>
+  
+  <Step title="After review">
+    - Address feedback promptly
+    - Push updates to same branch
+    - Respond to comments
+  </Step>
+</Steps>
+
+## Community Guidelines
+
+- **Be respectful** - Use welcoming and inclusive language
+- **Be helpful** - Offer assistance to other contributors
+- **Be patient** - Remember everyone is learning
+- **Follow the code of conduct** - Maintain a positive environment
+
+## Getting Help
+
+<CardGroup cols={2}>
+  <Card title="GitHub Issues" icon="github" href="https://github.com/Sorbh/sora-digital-photo-frame/issues">
+    Ask questions or report problems
+  </Card>
+  
+  <Card title="Discussions" icon="comments" href="https://github.com/Sorbh/sora-digital-photo-frame/discussions">
+    Join community discussions
+  </Card>
+</CardGroup>
+
+<Note>
+  **Need help getting started?** Open an issue with the "question" label and we'll help you contribute!
+</Note>

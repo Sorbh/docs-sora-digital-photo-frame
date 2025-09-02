@@ -1,33 +1,87 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: "API Introduction"
+description: "Getting started with the Sora Digital Photo Frame API"
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+## Overview
 
-## Welcome
+The Sora Digital Photo Frame API provides RESTful endpoints for managing photos, folders, and slideshow functionality. The API supports both public slideshow access and protected admin operations.
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+## Base URL
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+```
+http://localhost:3000/api
+```
+
+## API Categories
+
+<CardGroup cols={2}>
+  <Card title="Photos API" icon="image" href="/api-reference/photos/random">
+    Retrieve images for slideshow display
+  </Card>
+  
+  <Card title="Folders API" icon="folder" href="/api-reference/folders/list">
+    Manage folder structure and contents
+  </Card>
+  
+  <Card title="Authentication" icon="key" href="/api-reference/auth/login">
+    Admin login and session management
+  </Card>
+  
+  <Card title="Upload API" icon="upload" href="/api-reference/photos/upload">
+    Upload and delete images (admin only)
+  </Card>
+</CardGroup>
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+**Public Endpoints** - No authentication required:
+- Image retrieval for slideshow
+- Folder structure access
+
+**Protected Endpoints** - Require admin session:
+- Photo upload/delete operations
+- Admin folder management
+
+## Response Format
 
 ```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+{
+  "success": true,
+  "data": {},
+  "message": "Success message"
+}
 ```
+
+## Status Codes
+
+- `200` - Success
+- `400` - Bad Request  
+- `401` - Unauthorized
+- `403` - Forbidden
+- `404` - Not Found
+- `500` - Server Error
+
+## Quick Start
+
+<Steps>
+  <Step title="Start server">
+    ```bash
+    npm start
+    ```
+  </Step>
+  
+  <Step title="Test public endpoint">
+    ```bash
+    curl http://localhost:3000/api/folders
+    ```
+  </Step>
+  
+  <Step title="Admin login">
+    ```bash
+    curl -X POST http://localhost:3000/api/auth/login \
+      -H "Content-Type: application/json" \
+      -d '{"password": "your-password"}'
+    ```
+  </Step>
+</Steps>

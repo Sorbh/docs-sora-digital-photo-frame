@@ -1,0 +1,243 @@
+---
+title: "List Folders"
+description: "Get folder structure and contents"
+---
+
+## GET /api/folders
+
+Returns the folder structure and contents for slideshow navigation and admin management.
+
+### Parameters
+
+<ParamField query="path" type="string" optional>
+  Specific folder path to get contents from. If not provided, returns root level structure.
+</ParamField>
+
+### Request Examples
+
+```bash Root Structure
+curl http://localhost:3000/api/folders
+```
+
+```bash Specific Folder
+curl "http://localhost:3000/api/folders?path=vacation/2023"
+```
+
+### Response
+
+<ResponseExample>
+```json Root Structure Response
+{
+  "success": true,
+  "data": {
+    "currentPath": "",
+    "folders": [
+      {
+        "name": "vacation",
+        "path": "vacation",
+        "imageCount": 45,
+        "subfolderCount": 3,
+        "lastModified": "2023-07-20T15:30:00Z"
+      },
+      {
+        "name": "family-photos",
+        "path": "family-photos", 
+        "imageCount": 128,
+        "subfolderCount": 5,
+        "lastModified": "2023-06-15T09:20:00Z"
+      }
+    ],
+    "images": [
+      {
+        "name": "welcome.jpg",
+        "path": "welcome.jpg",
+        "size": 2048576,
+        "lastModified": "2023-05-01T12:00:00Z",
+        "dimensions": {
+          "width": 1920,
+          "height": 1080
+        }
+      }
+    ],
+    "totalFolders": 2,
+    "totalImages": 1
+  }
+}
+```
+</ResponseExample>
+
+<ResponseExample>
+```json Specific Folder Response
+{
+  "success": true,
+  "data": {
+    "currentPath": "vacation/2023",
+    "parentPath": "vacation",
+    "folders": [
+      {
+        "name": "summer",
+        "path": "vacation/2023/summer",
+        "imageCount": 23,
+        "subfolderCount": 0,
+        "lastModified": "2023-07-15T14:20:00Z"
+      },
+      {
+        "name": "winter",
+        "path": "vacation/2023/winter",
+        "imageCount": 18,
+        "subfolderCount": 0,
+        "lastModified": "2023-02-28T10:45:00Z"
+      }
+    ],
+    "images": [
+      {
+        "name": "beach-sunset.jpg",
+        "path": "vacation/2023/beach-sunset.jpg",
+        "size": 3145728,
+        "lastModified": "2023-07-10T18:30:00Z",
+        "dimensions": {
+          "width": 2560,
+          "height": 1440
+        }
+      }
+    ],
+    "totalFolders": 2,
+    "totalImages": 1
+  }
+}
+```
+</ResponseExample>
+
+### Response Fields
+
+<ResponseField name="currentPath" type="string">
+  Current folder path being viewed
+</ResponseField>
+
+<ResponseField name="parentPath" type="string">
+  Path to parent folder (null for root level)
+</ResponseField>
+
+<ResponseField name="folders" type="array">
+  Array of subfolders in current directory
+</ResponseField>
+
+<ResponseField name="images" type="array">
+  Array of images in current directory
+</ResponseField>
+
+<ResponseField name="totalFolders" type="number">
+  Count of subfolders in current directory
+</ResponseField>
+
+<ResponseField name="totalImages" type="number">
+  Count of images in current directory
+</ResponseField>
+
+### Folder Object
+
+<ResponseField name="name" type="string">
+  Folder display name
+</ResponseField>
+
+<ResponseField name="path" type="string">
+  Full path to folder from root
+</ResponseField>
+
+<ResponseField name="imageCount" type="number">
+  Number of images in this folder (recursive)
+</ResponseField>
+
+<ResponseField name="subfolderCount" type="number">
+  Number of direct subfolders
+</ResponseField>
+
+<ResponseField name="lastModified" type="string">
+  ISO timestamp of last modification
+</ResponseField>
+
+### Image Object
+
+<ResponseField name="name" type="string">
+  Image filename
+</ResponseField>
+
+<ResponseField name="path" type="string">
+  Full path to image from root
+</ResponseField>
+
+<ResponseField name="size" type="number">
+  File size in bytes
+</ResponseField>
+
+<ResponseField name="dimensions" type="object">
+  Image width and height in pixels
+</ResponseField>
+
+<ResponseField name="lastModified" type="string">
+  ISO timestamp of last modification
+</ResponseField>
+
+### Status Codes
+
+<ResponseField name="200" type="Success">
+  Folder contents retrieved successfully
+</ResponseField>
+
+<ResponseField name="404" type="Not Found">
+  Specified folder path does not exist
+</ResponseField>
+
+<ResponseField name="500" type="Server Error">
+  Error accessing file system
+</ResponseField>
+
+### Usage Example
+
+```javascript
+async function loadFolderContents(folderPath = '') {
+  try {
+    const url = folderPath 
+      ? `/api/folders?path=${encodeURIComponent(folderPath)}`
+      : '/api/folders';
+      
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    if (data.success) {
+      return {
+        folders: data.data.folders,
+        images: data.data.images,
+        currentPath: data.data.currentPath,
+        parentPath: data.data.parentPath
+      };
+    } else {
+      throw new Error(data.error);
+    }
+  } catch (error) {
+    console.error('Failed to load folder:', error);
+    throw error;
+  }
+}
+
+// Build folder navigation
+function buildFolderTree() {
+  loadFolderContents()
+    .then(data => {
+      data.folders.forEach(folder => {
+        console.log(`${folder.name}: ${folder.imageCount} images`);
+      });
+    })
+    .catch(error => {
+      console.error('Navigation failed:', error);
+    });
+}
+```
+
+### Path Handling
+
+- Use forward slashes for folder separators
+- Paths are relative to the uploads directory  
+- URL encode folder names with special characters
+- Empty path parameter returns root level
+- Invalid paths return 404 error

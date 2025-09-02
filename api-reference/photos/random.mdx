@@ -1,0 +1,132 @@
+---
+title: "Get Random Image"
+description: "Retrieve random images for slideshow display"
+---
+
+## GET /api/images/random
+
+Returns a random image from the photo collection for slideshow display.
+
+### Parameters
+
+<ParamField query="folder" type="string" optional>
+  Specific folder path to get random image from. If not provided, selects from all images.
+</ParamField>
+
+### Request Examples
+
+```bash All Images
+curl http://localhost:3000/api/images/random
+```
+
+```bash Specific Folder
+curl "http://localhost:3000/api/images/random?folder=vacation/2023"
+```
+
+### Response
+
+<ResponseExample>
+```json Success Response
+{
+  "success": true,
+  "data": {
+    "imagePath": "/uploads/vacation/2023/beach.jpg",
+    "fileName": "beach.jpg",
+    "folder": "vacation/2023",
+    "url": "/uploads/vacation/2023/beach.jpg",
+    "metadata": {
+      "size": 2048576,
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "lastModified": "2023-07-15T10:30:00Z"
+    }
+  }
+}
+```
+</ResponseExample>
+
+<ResponseExample>
+```json No Images Found
+{
+  "success": false,
+  "error": "No images found in specified location",
+  "code": "NO_IMAGES_AVAILABLE"
+}
+```
+</ResponseExample>
+
+### Response Fields
+
+<ResponseField name="imagePath" type="string">
+  Server file path to the image
+</ResponseField>
+
+<ResponseField name="fileName" type="string">
+  Original filename of the image
+</ResponseField>
+
+<ResponseField name="folder" type="string">
+  Folder path containing the image
+</ResponseField>
+
+<ResponseField name="url" type="string">
+  Public URL path for accessing the image
+</ResponseField>
+
+<ResponseField name="metadata" type="object">
+  Image metadata including size, dimensions, and modification date
+</ResponseField>
+
+### Status Codes
+
+<ResponseField name="200" type="Success">
+  Random image retrieved successfully
+</ResponseField>
+
+<ResponseField name="404" type="Not Found">
+  No images found in collection or specified folder
+</ResponseField>
+
+<ResponseField name="500" type="Server Error">
+  Error accessing file system or processing images
+</ResponseField>
+
+### Usage in Slideshow
+
+```javascript
+async function loadRandomImage() {
+  try {
+    const response = await fetch('/api/images/random');
+    const data = await response.json();
+    
+    if (data.success) {
+      const img = document.getElementById('slideshow-image');
+      img.src = data.data.url;
+      img.alt = data.data.fileName;
+    }
+  } catch (error) {
+    console.error('Failed to load image:', error);
+  }
+}
+
+// Load new image every 5 seconds
+setInterval(loadRandomImage, 5000);
+```
+
+### Folder Filtering
+
+When using the `folder` parameter:
+- Use forward slashes for nested folders: `vacation/2023/summer`
+- Folder paths are relative to the uploads directory
+- Invalid folder paths return no results
+- Empty folders return no results
+
+### Image Formats
+
+Supported formats:
+- JPEG (.jpg, .jpeg)
+- PNG (.png)
+- GIF (.gif)
+- WebP (.webp)

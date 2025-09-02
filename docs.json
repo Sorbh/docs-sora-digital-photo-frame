@@ -7,7 +7,7 @@
     "light": "#8B5CF6",
     "dark": "#4338CA"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/public/favicon.ico",
   "navigation": {
     "tabs": [
       {
@@ -16,19 +16,8 @@
           {
             "group": "Getting Started",
             "pages": [
-              "index",
-              "quickstart",
-              "installation",
-              "configuration"
-            ]
-          },
-          {
-            "group": "User Guide",
-            "pages": [
-              "features/overview",
-              "features/slideshow",
-              "features/admin-panel",
-              "features/keyboard-controls"
+              "introduction",
+              "quickstart"
             ]
           },
           {
@@ -55,18 +44,28 @@
           {
             "group": "REST API",
             "pages": [
-              "api-reference/introduction",
-              "api-reference/authentication"
+              "api-reference/introduction"
             ]
           },
           {
-            "group": "Endpoints",
+            "group": "Authentication",
             "pages": [
-              "api-reference/photos/list",
+              "api-reference/auth/login"
+            ]
+          },
+          {
+            "group": "Photos API",
+            "pages": [
+              "api-reference/photos/random",
               "api-reference/photos/upload",
-              "api-reference/photos/delete",
-              "api-reference/folders/create",
-              "api-reference/folders/list"
+              "api-reference/photos/delete"
+            ]
+          },
+          {
+            "group": "Folders API",
+            "pages": [
+              "api-reference/folders/list",
+              "api-reference/folders/create"
             ]
           }
         ]
@@ -93,8 +92,8 @@
     }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/public/logo.png",
+    "dark": "/public/logo.png"
   },
   "navbar": {
     "links": [

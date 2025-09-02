@@ -1,0 +1,94 @@
+---
+title: "Login Authentication"
+description: "Admin authentication for protected endpoints"
+---
+
+## POST /api/auth/login
+
+Authenticates admin user and establishes a session for accessing protected endpoints.
+
+### Request
+
+<ParamField path="password" type="string" required>
+  Admin password configured in environment variables
+</ParamField>
+
+```bash
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"password": "your-admin-password"}'
+```
+
+### Response
+
+<ResponseExample>
+```json Success Response
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "authenticated": true,
+    "sessionId": "session-id-here"
+  }
+}
+```
+</ResponseExample>
+
+<ResponseExample>
+```json Error Response
+{
+  "success": false,
+  "error": "Invalid password",
+  "code": "AUTHENTICATION_FAILED"
+}
+```
+</ResponseExample>
+
+### Status Codes
+
+<ResponseField name="200" type="Success">
+  Login successful, session established
+</ResponseField>
+
+<ResponseField name="400" type="Bad Request">
+  Missing or invalid password in request body
+</ResponseField>
+
+<ResponseField name="401" type="Unauthorized">
+  Invalid password provided
+</ResponseField>
+
+### Session Management
+
+After successful login:
+- Session cookie is set automatically
+- Cookie is required for all protected endpoints
+- Session persists until server restart or explicit logout
+
+### Usage Example
+
+```javascript
+// Login and store session
+const loginResponse = await fetch('/api/auth/login', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    password: 'your-admin-password'
+  })
+});
+
+if (loginResponse.ok) {
+  // Session cookie is automatically stored
+  // Now you can access protected endpoints
+  const adminData = await fetch('/api/admin');
+}
+```
+
+### Security Notes
+
+- Password is configured via `ADMIN_PASSWORD` environment variable
+- Session cookies are HTTP-only for security
+- No password is returned in response
+- Failed login attempts are logged

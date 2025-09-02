@@ -1,0 +1,314 @@
+---
+title: "Setup"
+description: "Set up your development environment for contributing to Sora Digital Photo Frame"
+---
+
+## Prerequisites
+
+Before you begin development, ensure you have the following installed:
+
+<AccordionGroup>
+  <Accordion icon="terminal" title="Node.js 18.0+">
+    Install Node.js version 18.0 or higher:
+    
+    ```bash
+    # Check your current version
+    node --version
+    
+    # Should return v18.0.0 or higher
+    ```
+    
+    Download from [nodejs.org](https://nodejs.org) if you need to upgrade.
+  </Accordion>
+  
+  <Accordion icon="github" title="Git">
+    Ensure Git is installed for version control:
+    
+    ```bash
+    git --version
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Development Installation
+
+### 1. Fork and Clone
+
+<Steps>
+  <Step title="Fork the repository">
+    Fork the [Sora Digital Photo Frame repository](https://github.com/Sorbh/sora-digital-photo-frame) on GitHub.
+  </Step>
+  
+  <Step title="Clone your fork">
+    ```bash
+    git clone https://github.com/YOUR_USERNAME/sora-digital-photo-frame.git
+    cd sora-digital-photo-frame
+    ```
+  </Step>
+  
+  <Step title="Add upstream remote">
+    ```bash
+    git remote add upstream https://github.com/Sorbh/sora-digital-photo-frame.git
+    ```
+  </Step>
+</Steps>
+
+### 2. Install Dependencies
+
+Install all project dependencies:
+
+```bash
+npm install
+```
+
+This will install both runtime and development dependencies needed for the project.
+
+### 3. Environment Configuration
+
+<AccordionGroup>
+  <Accordion icon="gear" title="Development environment">
+    1. Copy the example environment file:
+    ```bash
+    cp .env.example .env
+    ```
+    
+    2. Configure for development:
+    ```env
+    # Server Configuration
+    PORT=3000
+    NODE_ENV=development
+    
+    # Authentication (for development)
+    ADMIN_PASSWORD=dev123
+    
+    # Upload Configuration
+    MAX_FILE_SIZE=10485760
+    UPLOAD_DIR=uploads
+    
+    # Image Processing
+    IMAGE_QUALITY=85
+    MAX_RESOLUTION_WIDTH=1920
+    MAX_RESOLUTION_HEIGHT=1080
+    
+    # Development flags
+    DEBUG=true
+    LOG_LEVEL=debug
+    ```
+  </Accordion>
+  
+  <Accordion icon="folder" title="Test photos directory">
+    Create a test photos directory for development:
+    ```bash
+    mkdir uploads
+    mkdir uploads/test-photos
+    ```
+    
+    Add some test images to verify your setup works correctly.
+  </Accordion>
+</AccordionGroup>
+
+## Development Workflow
+
+### Running in Development Mode
+
+<Steps>
+  <Step title="Start the development server">
+    ```bash
+    npm run dev
+    ```
+    
+    This starts the server with hot reloading and development logging enabled.
+  </Step>
+  
+  <Step title="Access the application">
+    Open your browser to:
+    - **Main app**: http://localhost:3000
+    - **Admin panel**: http://localhost:3000/admin
+  </Step>
+  
+  <Step title="Test photo upload">
+    Navigate to the admin panel and test uploading photos to ensure everything works.
+  </Step>
+</Steps>
+
+### Available Scripts
+
+<CodeGroup>
+  ```bash Development
+  npm run dev          # Start with hot reloading
+  npm run dev:debug    # Start with debug logging
+  ```
+  
+  ```bash Production
+  npm start           # Production server
+  npm run build       # Build for production
+  ```
+  
+  ```bash Testing
+  npm test           # Run test suite
+  npm run test:watch # Run tests in watch mode
+  npm run test:coverage # Run with coverage report
+  ```
+  
+  ```bash Code Quality
+  npm run lint       # Run ESLint
+  npm run lint:fix   # Fix auto-fixable issues
+  npm run format     # Format code with Prettier
+  ```
+</CodeGroup>
+
+## Development Guidelines
+
+### Code Style
+
+<AccordionGroup>
+  <Accordion icon="code" title="JavaScript/Node.js">
+    - Use ES6+ features and async/await
+    - Follow ESLint configuration
+    - Use meaningful variable and function names
+    - Add JSDoc comments for functions
+    
+    ```javascript
+    /**
+     * Resizes an image to specified dimensions
+     * @param {string} inputPath - Path to input image
+     * @param {Object} options - Resize options
+     * @returns {Promise<string>} Path to resized image
+     */
+    async function resizeImage(inputPath, options) {
+      // Implementation
+    }
+    ```
+  </Accordion>
+  
+  <Accordion icon="palette" title="CSS/Styling">
+    - Follow Material Design principles
+    - Use CSS custom properties for theming
+    - Mobile-first responsive design
+    - BEM naming convention for CSS classes
+  </Accordion>
+</AccordionGroup>
+
+### Git Workflow
+
+<Steps>
+  <Step title="Create feature branch">
+    ```bash
+    git checkout -b feature/your-feature-name
+    ```
+  </Step>
+  
+  <Step title="Make your changes">
+    Develop your feature with frequent commits:
+    ```bash
+    git add .
+    git commit -m "feat: add new slideshow transition effect"
+    ```
+  </Step>
+  
+  <Step title="Keep updated">
+    Regularly sync with upstream:
+    ```bash
+    git fetch upstream
+    git rebase upstream/main
+    ```
+  </Step>
+  
+  <Step title="Push and create PR">
+    ```bash
+    git push origin feature/your-feature-name
+    ```
+    Then create a Pull Request on GitHub.
+  </Step>
+</Steps>
+
+## Testing
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode during development
+npm run test:watch
+
+# Run with coverage report
+npm run test:coverage
+```
+
+### Writing Tests
+
+Create tests in the `tests/` directory:
+
+```javascript
+// tests/api/photos.test.js
+const request = require('supertest');
+const app = require('../../src/server');
+
+describe('Photos API', () => {
+  test('GET /api/photos returns photo list', async () => {
+    const response = await request(app)
+      .get('/api/photos')
+      .expect(200);
+      
+    expect(response.body).toHaveProperty('photos');
+  });
+});
+```
+
+## Debugging
+
+<AccordionGroup>
+  <Accordion icon="bug" title="Server-side debugging">
+    Use Node.js debugger or VS Code:
+    
+    ```bash
+    # Start with Node.js debugger
+    node --inspect src/server.js
+    
+    # Or use npm script
+    npm run debug
+    ```
+  </Accordion>
+  
+  <Accordion icon="browser" title="Client-side debugging">
+    - Use browser Developer Tools
+    - Check console for JavaScript errors
+    - Use Network tab to inspect API calls
+    - Test responsive design in device emulation
+  </Accordion>
+</AccordionGroup>
+
+## Common Development Tasks
+
+<CardGroup cols={2}>
+  <Card title="Add API Endpoint" icon="code">
+    Create new routes in `src/routes/` and register them in the main server file.
+  </Card>
+  
+  <Card title="Modify UI" icon="palette">
+    Update HTML templates and CSS in the `public/` directory.
+  </Card>
+  
+  <Card title="Add Configuration" icon="gear">
+    Add new environment variables to `.env.example` and document them.
+  </Card>
+  
+  <Card title="Optimize Images" icon="image">
+    Modify image processing utilities in `src/utils/imageProcessor.js`.
+  </Card>
+</CardGroup>
+
+## Performance Considerations
+
+- **Image Processing**: Use efficient libraries like Sharp for image manipulation
+- **Caching**: Implement proper caching strategies for processed images
+- **Memory Usage**: Monitor memory usage with large image collections
+- **Network**: Optimize image delivery with appropriate compression
+
+## Need Help?
+
+<Note>
+  **Stuck on something?** Check the [contributing guidelines](/development/contributing) or open an issue on GitHub for help from the community.
+</Note>
